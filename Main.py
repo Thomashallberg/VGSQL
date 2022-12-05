@@ -1,11 +1,15 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade, init, migrate
+from sqlalchemy import not_, or_
+from datetime import date
+
  
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+mysqlconnector://root:my-secret-pw@localhost:3306/Hotell"
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
+
  
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +34,6 @@ if __name__  == "__main__":
     with app.app_context():
         upgrade()
 
-
     with app.app_context():
         while True:
             print("1. Register customer")
@@ -53,10 +56,28 @@ if __name__  == "__main__":
                 u.telefonnummer = input("Ange nytt nummer:")
                 db.session.commit()
             if sel == "3":
+               
+                borjan_date = input("Format YYYY-MM-DD")
+                slut_date = input("Format YYYY-MM-DD")
+                
+                upptagna = []
+                for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):
+                
+                    print(f"Rum: {r.id} ")
+                    upptagna.append(r.id)
+                    for b in r.bokningar:
+                        print(f"    {b.start_date} {b.end_date}  Dessa rum går inte att boka!")
+                
+                
                 b = Booking()
                 b.customer_id = input("Ange customer ID:")
-                b.room_id = input("Ange Room ID")
-                b.start_date = input("Datum format (yyyy-mm-dd")
-                b.end_date = input("Datum format (yyyy-mm-dd")
-                db.session.add(b)
-                db.session.commit()
+                b.room_id = int(input(("Ange Room ID (1-5 finns)")))
+                b.start_date = borjan_date
+                b.end_date = slut_date
+                print(upptagna)
+                if b.room_id in upptagna:
+                    print("Det går ej att boka detta rum, byt ID")
+                else:
+                    db.session.add(b)
+                    db.session.commit()
+                    print("Rum bokat")
