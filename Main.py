@@ -40,6 +40,7 @@ if __name__  == "__main__":
             print("2. Edit customer")
             print("3. Book a room")
             print("4. Search free rooms and customer")
+            print("5. Remove a customer")
             sel = input("What would you like to do?:")
 
             if sel == "1":
@@ -95,3 +96,15 @@ if __name__  == "__main__":
                     for b in r.bokningar:
                         c = Customer.query.filter_by(id=b.customer_id).first()
                         print(f"    {b.start_date} {b.end_date} Bokat utav: {c.namn}  Dessa rum går inte att boka!")
+            if sel == "5":
+                for x in Customer.query.all():
+                    print(f"{x.id} {x.namn} {x.telefonnummer} Har bokningar?: {len(x.bokningar)}")
+                delete = input("Skriv in kund-id som ska tas bort")
+                c = Customer.query.filter_by(id=delete).first()
+                if len(c.bokningar) > 0:
+                    print("Du kan inte ta bort en kund med stående bokning")
+                else:
+                    Customer.query.filter_by(id=delete).delete()
+                    db.session.commit()
+                    print("Kund borttagen")
+                
