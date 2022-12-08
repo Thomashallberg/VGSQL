@@ -41,6 +41,7 @@ if __name__  == "__main__":
             print("3. Book a room")
             print("4. Search free rooms and customer")
             print("5. Remove a customer")
+            print("6. Remove a booking")
             sel = input("What would you like to do?:")
 
             if sel == "1":
@@ -107,4 +108,12 @@ if __name__  == "__main__":
                     Customer.query.filter_by(id=delete).delete()
                     db.session.commit()
                     print("Kund borttagen")
+            if sel == "6":
+                for x in Booking.query.all():
+                    print(x.id)
+                delete = input("Which booking ID would you like to remove?")
+                Booking.query.filter_by(id=delete).delete()
+                db.session.commit()
+                print("Bokning borttagen")
+                
                 
