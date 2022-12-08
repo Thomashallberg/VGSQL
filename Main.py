@@ -39,6 +39,7 @@ if __name__  == "__main__":
             print("1. Register customer")
             print("2. Edit customer")
             print("3. Book a room")
+            print("4. Search free rooms and customer")
             sel = input("What would you like to do?:")
 
             if sel == "1":
@@ -57,10 +58,11 @@ if __name__  == "__main__":
                 db.session.commit()
             if sel == "3":
                
-                borjan_date = input("Format YYYY-MM-DD")
-                slut_date = input("Format YYYY-MM-DD")
+                borjan_date = input("Format YYYY-MM-DD (Default: 2022-12-02): ") or "2022-12-02"
+                slut_date = input("Format YYYY-MM-DD (Default: 2022-12-16): ") or "2022-12-16"
                 
                 upptagna = []
+                print(" 1-5 är alla rum som går att boka")
                 for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):
                 
                     print(f"Rum: {r.id} ")
@@ -81,3 +83,15 @@ if __name__  == "__main__":
                     db.session.add(b)
                     db.session.commit()
                     print("Rum bokat")
+            if sel == "4":
+                borjan_date = input("Format YYYY-MM-DD (Default: 2010-01-01): ") or "2010-01-01"
+                slut_date = input("Format YYYY-MM-DD (Default: 2040-10-10): ") or "2040-10-10"
+                
+                upptagna = []
+                for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):
+                
+                    print(f"Rum: {r.id} ")
+                    upptagna.append(r.id)
+                    for b in r.bokningar:
+                        c = Customer.query.filter_by(id=b.customer_id).first()
+                        print(f"    {b.start_date} {b.end_date} Bokat utav: {c.namn}  Dessa rum går inte att boka!")
