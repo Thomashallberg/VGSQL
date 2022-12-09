@@ -124,9 +124,20 @@ if __name__  == "__main__":
                     print(x.id)
                 booking_id = input("Vilken bokning vill du ändra?")
                 
-                b = Booking.query.filter_by(id=booking_id).first()
-                b.start_date = input("Format YYYY-MM-DD (Default: 2022-12-02): ") or "2022-12-02"
-                b.end_date = input("Format YYYY-MM-DD (Default: 2022-12-16): ") or "2022-12-16"
-                db.session.commit()
-                print("Ombokning slutförd")
+                borjan_date = input("Format YYYY-MM-DD (Default: 2022-12-02): ") or "2022-12-02"
+                slut_date = input("Format YYYY-MM-DD (Default: 2022-12-16): ") or "2022-12-16"
+                upptagna = []
+                print(" 1-5 är alla rum som går att boka")
+                for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):
                 
+                    print(f"Rum: {r.id} ")
+                    upptagna.append(r.id)
+                
+                b = Booking.query.filter_by(id=booking_id).first()
+                b.start_date = borjan_date
+                b.end_date = slut_date
+                if b.room_id in upptagna:
+                    print("Det går ej att boka detta rum, byt ID")
+                else:
+                    db.session.commit()
+                    print("Rum ombokat")
