@@ -30,6 +30,33 @@ class Booking(db.Model):
     start_date = db.Column(db.Date, unique=False, nullable=False)
     end_date = db.Column(db.Date, unique=False, nullable=False)
     
+def BusyRooms(borjan_date, slut_date):
+    
+    upptagna = []
+    for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):
+        upptagna.append(r.id)
+    return upptagna
+    
+def PrintBusyRooms(borjan_date, slut_date):
+    
+    for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):
+        print(f"Rum: {r.id} ")
+        upptagna.append(r.id)
+        for b in r.bokningar:
+            print(f"    {b.start_date} {b.end_date}  Dessa rum går inte att boka!")
+        print(" 1-5 är alla rum som går att boka")
+        
+def SearchFreeRooms(borjan_date, slut_date):
+    
+    for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):    
+        print(f"Rum: {r.id} ")
+        for b in r.bokningar:
+            c = Customer.query.filter_by(id=b.customer_id).first()
+            print(f"    {b.start_date} {b.end_date} Bokat utav: {c.namn}  Dessa rum går inte att boka!")
+
+
+    
+    
 if __name__  == "__main__":
     with app.app_context():
         upgrade()
@@ -64,16 +91,10 @@ if __name__  == "__main__":
                 borjan_date = input("Format YYYY-MM-DD (Default: 2022-12-02): ") or "2022-12-02"
                 slut_date = input("Format YYYY-MM-DD (Default: 2022-12-16): ") or "2022-12-16"
                 
-                upptagna = []
-                print(" 1-5 är alla rum som går att boka")
-                for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):
+                upptagna = BusyRooms(borjan_date, slut_date)
+                PrintBusyRooms(borjan_date, slut_date)
                 
-                    print(f"Rum: {r.id} ")
-                    upptagna.append(r.id)
-                    for b in r.bokningar:
-                        print(f"    {b.start_date} {b.end_date}  Dessa rum går inte att boka!")
-                
-                
+            
                 b = Booking()
                 b.customer_id = input("Ange customer ID:")
                 b.room_id = int(input(("Ange Room ID (1-5 finns)")))
@@ -90,14 +111,9 @@ if __name__  == "__main__":
                 borjan_date = input("Format YYYY-MM-DD (Default: 2010-01-01): ") or "2010-01-01"
                 slut_date = input("Format YYYY-MM-DD (Default: 2040-10-10): ") or "2040-10-10"
                 
-                upptagna = []
-                for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):
-                
-                    print(f"Rum: {r.id} ")
-                    upptagna.append(r.id)
-                    for b in r.bokningar:
-                        c = Customer.query.filter_by(id=b.customer_id).first()
-                        print(f"    {b.start_date} {b.end_date} Bokat utav: {c.namn}  Dessa rum går inte att boka!")
+                SearchFreeRooms(borjan_date, slut_date)
+                print("Rummen som finns är 1-5")
+    
             if sel == "5":
                 for x in Customer.query.all():
                     print(f"{x.id} {x.namn} {x.telefonnummer} Har bokningar?: {len(x.bokningar)}")
@@ -127,11 +143,8 @@ if __name__  == "__main__":
                 borjan_date = input("Format YYYY-MM-DD (Default: 2022-12-02): ") or "2022-12-02"
                 slut_date = input("Format YYYY-MM-DD (Default: 2022-12-16): ") or "2022-12-16"
                 upptagna = []
-                print(" 1-5 är alla rum som går att boka")
-                for r in Room.query.join(Booking).filter(or_(Booking.start_date.between(borjan_date, slut_date),(Booking.end_date.between(borjan_date,slut_date)))):
-                
-                    print(f"Rum: {r.id} ")
-                    upptagna.append(r.id)
+                upptagna = BusyRooms(borjan_date, slut_date)
+                PrintBusyRooms(borjan_date, slut_date)
                 
                 b = Booking.query.filter_by(id=booking_id).first()
                 b.start_date = borjan_date
