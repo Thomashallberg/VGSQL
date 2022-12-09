@@ -42,6 +42,7 @@ if __name__  == "__main__":
             print("4. Search free rooms and customer")
             print("5. Remove a customer")
             print("6. Remove a booking")
+            print("7. Change booking")
             sel = input("What would you like to do?:")
 
             if sel == "1":
@@ -84,7 +85,7 @@ if __name__  == "__main__":
                 else:
                     db.session.add(b)
                     db.session.commit()
-                    print("Rum bokat")
+                    print("Rum ombokat")
             if sel == "4":
                 borjan_date = input("Format YYYY-MM-DD (Default: 2010-01-01): ") or "2010-01-01"
                 slut_date = input("Format YYYY-MM-DD (Default: 2040-10-10): ") or "2040-10-10"
@@ -108,6 +109,7 @@ if __name__  == "__main__":
                     Customer.query.filter_by(id=delete).delete()
                     db.session.commit()
                     print("Kund borttagen")
+                    
             if sel == "6":
                 for x in Booking.query.all():
                     print(x.id)
@@ -116,4 +118,15 @@ if __name__  == "__main__":
                 db.session.commit()
                 print("Bokning borttagen")
                 
+            if sel == "7":
+                
+                for x in Booking.query.all():
+                    print(x.id)
+                booking_id = input("Vilken bokning vill du ändra?")
+                
+                b = Booking.query.filter_by(id=booking_id).first()
+                b.start_date = input("Format YYYY-MM-DD (Default: 2022-12-02): ") or "2022-12-02"
+                b.end_date = input("Format YYYY-MM-DD (Default: 2022-12-16): ") or "2022-12-16"
+                db.session.commit()
+                print("Ombokning slutförd")
                 
