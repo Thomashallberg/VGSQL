@@ -82,6 +82,7 @@ if __name__  == "__main__":
             print("6. Remove a booking")
             print("7. Change booking")
             print("8. Register payment")
+            print("9. Annul invoice")
             sel = input("What would you like to do?:")
 
             if sel == "1":
@@ -90,6 +91,7 @@ if __name__  == "__main__":
                 c.telefonnummer = input("Ange telefonnummer:")
                 db.session.add(c)
                 db.session.commit()
+                
             if sel == "2":
                 for x in Customer.query.all():
                     print(f"{x.id} {x.namn} {x.telefonnummer}")
@@ -98,6 +100,7 @@ if __name__  == "__main__":
                 u.namn = input("Ange nytt namn:")
                 u.telefonnummer = input("Ange nytt nummer:")
                 db.session.commit()
+                
             if sel == "3":
                
                 borjan_date = input("Format YYYY-MM-DD (Default: 2022-12-02): ") or "2022-12-02"
@@ -113,6 +116,7 @@ if __name__  == "__main__":
                 b.start_date = borjan_date
                 b.end_date = slut_date
                 print(upptagna)
+                
                 if b.room_id in upptagna:
                     print("Det går ej att boka detta rum, byt ID")
                 else:
@@ -127,6 +131,7 @@ if __name__  == "__main__":
                     db.session.add(b)
                     db.session.commit()
                     print("Rum ombokat")
+                    
             if sel == "4":
                 borjan_date = input("Format YYYY-MM-DD (Default: 2010-01-01): ") or "2010-01-01"
                 slut_date = input("Format YYYY-MM-DD (Default: 2040-10-10): ") or "2040-10-10"
@@ -174,6 +179,7 @@ if __name__  == "__main__":
                 else:
                     db.session.commit()
                     print("Rum ombokat")
+                    
             if sel == "8":
                 for x in Invoice.query.all():
                     print(x.id)
@@ -183,5 +189,18 @@ if __name__  == "__main__":
                 db.session.commit()
                 print("invoice paid")
                 
+            if sel == "9":
+                
+                now = datetime.now().date()
+                
+                for x in Booking.query.all():
+                    if x.invoice == None:
+                        print("Fakturan är inte kopplad till en bokning")
+                    else:
+                        if x.invoice.betald == False and now > x.invoice.forfallodatum:
+                            Booking.query.filter_by(id=x.id).delete()
+                            print(f"Faktura id: {x.id} Har försen betalning, bokning annuleras")
+                            db.session.commit()
+                        
                 
                 
