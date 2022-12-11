@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, upgrade, init, migrate
 from sqlalchemy import not_, or_
-from datetime import date
+from datetime import date, datetime, timedelta
 
  
 app = Flask(__name__)
@@ -29,6 +29,17 @@ class Booking(db.Model):
     room_id = db.Column(db.Integer, db.ForeignKey('room.id'), nullable=False)
     start_date = db.Column(db.Date, unique=False, nullable=False)
     end_date = db.Column(db.Date, unique=False, nullable=False)
+    invoice_id = db.Column(db.Integer, db.ForeignKey('invoice.id'), nullable=True)
+    
+    
+class Invoice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    invoice_belopp = db.Column(db.Integer, unique=False, nullable=False)
+    forfallodatum = db.Column(db.Date, unique=False, nullable=False)
+    betald = db.Column(db.Boolean,unique=False, nullable=False)
+    bokningar = db.relationship('Booking', backref='invoice', lazy=True)
+    
+    
     
 def BusyRooms(borjan_date, slut_date):
     
@@ -104,6 +115,14 @@ if __name__  == "__main__":
                 if b.room_id in upptagna:
                     print("Det går ej att boka detta rum, byt ID")
                 else:
+                    now = datetime.now()
+                    tiodagar = timedelta(days=10)
+                    
+                    f = Invoice()
+                    f.invoice_belopp = 200
+                    f.forfallodatum = (now+tiodagar).date()
+                    f.betald = False
+                    b.invoice = f
                     db.session.add(b)
                     db.session.commit()
                     print("Rum ombokat")
