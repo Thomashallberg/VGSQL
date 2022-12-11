@@ -81,6 +81,7 @@ if __name__  == "__main__":
             print("5. Remove a customer")
             print("6. Remove a booking")
             print("7. Change booking")
+            print("8. Register payment")
             sel = input("What would you like to do?:")
 
             if sel == "1":
@@ -173,3 +174,14 @@ if __name__  == "__main__":
                 else:
                     db.session.commit()
                     print("Rum ombokat")
+            if sel == "8":
+                for x in Invoice.query.all():
+                    print(x.id)
+                id = input("Which invoice would you like to register?")
+                f = Invoice.query.filter_by(id=id).first()
+                f.betald = True
+                db.session.commit()
+                print("invoice paid")
+                
+                
+                
