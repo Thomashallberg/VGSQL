@@ -57,9 +57,9 @@ def PrintAvailableRooms(borjan_date, slut_date):
 
             
         
-def SearchFreeRooms(borjan_date, slut_date, bedchoice):
+def SearchFreeRooms(borjan_date, slut_date, roomsize):
     
-    for r in Room.query.filter_by(bed_count = bedchoice).all():
+    for r in Room.query.filter_by(room_size = roomsize).all():
         if r.id not in BusyRooms(borjan_date, slut_date):
             print(r.id)
         
@@ -80,6 +80,7 @@ if __name__  == "__main__":
             print("7. Change booking")
             print("8. Register payment")
             print("9. Annul invoice")
+            print("10. Add an extra bed")
             sel = input("What would you like to do?:")
 
             if sel == "1":
@@ -130,11 +131,11 @@ if __name__  == "__main__":
                     print("Rum ombokat")
                     
             if sel == "4":
-                bedchoice = input("Hur många sängar? 1-2?")
+                roomsize = input("Hur många sängar? 1-2?")
                 borjan_date = input("Format YYYY-MM-DD (Default: 2010-01-01): ") or "2010-01-01"
                 slut_date = input("Format YYYY-MM-DD (Default: 2040-10-10): ") or "2040-10-10"
                 
-                SearchFreeRooms(borjan_date, slut_date, bedchoice)
+                SearchFreeRooms(borjan_date, slut_date, roomsize)
                 print("Rummen som finns är 1-5")
     
             if sel == "5":
@@ -199,6 +200,19 @@ if __name__  == "__main__":
                             Booking.query.filter_by(id=x.id).delete()
                             print(f"Faktura id: {x.id} Har försen betalning, bokning annuleras")
                             db.session.commit()
+            
+            if sel == "10":
+                
+                for r in Room.query.filter_by(room_size = 2).all():
+                    print(r.id)
+                id = input("Vilket rum id vill du lägga till en säng i?")
+                
+                b = Room.query.filter_by(id=id).first()
+                b.bed_count = input("Hur många sängar vill du lägga till? 1-2")
+                db.session.commit()
+                print("Lade till 2 extra sängar")
+                        
+                
                         
                 
                 
